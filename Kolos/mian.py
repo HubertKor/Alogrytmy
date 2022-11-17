@@ -1,49 +1,74 @@
 class ListaWpis:
-    def __init__(self,wart: str):
-        self.nast = None
-        self.poprz = None
+    def __init__(self, wart, poprzedni=None, nastepny=None):
+        self.nast = nastepny
+        self.poprz = poprzedni
         self.wart = wart
+        if self.nast is None and self.poprz is None:
+            self.nast = self
+            self.poprz = self
+        else:
+            self.poprz.nast = self
+            self.nast.poprz = self
+
+    def dodaj_po_nim(self, wart):
+        temp = self.nast
+        self.nast = ListaWpis(wart, self, temp)
+
+    def dodaj_przed_nim(self, wart):
+        temp = self.poprz
+        self.poprz = ListaWpis(wart, temp, self)
+
+    def zamien(self, el_inny): # 1->2->3->    /  ->2->1->3
+        tempp = self.poprz #1
+        tempn = self.nast #3
+        self.poprz = el_inny #2
+        self.nast = el_inny #1
+        el_inny.poprz = tempp #2 /1
+        el_inny.nast = self #1 /3
+        self.nast = el_inny
+
+    def zamienn(self, el_inny):
+        temp = None
+        temp = self.nast
+        self.nast = el_inny.nast
+        el_inny.nast = temp
+
+        if self.nast != None:
+            self.nast.poprz = self
+        if el_inny.nast != None:
+            el_inny.nast.poprz = el_inny
+
+        temp = self.poprz
+        self.poprz = el_inny.poprz
+        el_inny.poprz = temp
+
+        if self.poprz != None:
+            self.poprz.nast = self
+        if el_inny.poprz != None:
+            el_inny.poprz.nast = el_inny
 
 class Lista_2k_k:
-    def __init__(self):        
-        self.head = None
-        self.tail = None
+    def __init__(self):
+        self.element = None
 
-    def dodaj_po_nim(self,new_data): # dodaje za nim element
-        new_node = ListaWpis(new_data) # tworzenie węzła
-        new_node.nast = self.head # nowa głowa jako nowa głowa
+    def print_w_tyl(self):
+        current = self.element
+        while current.poprz != self.element:
+            print(f'{current.poprz.wart}<>', end='')
+            current = current.poprz
+        print(f'{current.poprz.wart}<>', end='')
 
-        if self.head != None: # sprawdza czy głowa jest pusta czy nie
-            self.head.poprz = new_node # stara glowa jako nowa glowa 
-            self.head = new_node # nowy węzeł jako nowa głowa
-            new_node.poprz = None # poprzednik jako None
+    def pobierz_el(self, idx:int):
+        if idx == 0:
+            return self.element
 
-        else: # jezeli lista jest pusta tworzy nowy ogon i głowe 
-            self.head = new_node 
-            self.tail = new_node
-            new_node.poprz = None # oba wskaźniki są nullami 
-    
-    def dodaj_przed_nim(self,new_data):
-        new_node = ListaWpis(new_data)
-        new_node.poprz = self.tail
 
-        if self.tail == None:
-            self.head = new_node
-            self.tail = new_node
-            new_node.nast = None
-
-        else:
-            self.tail.nast = new_node
-            new_node.poprz = None
-            self.tail = new_node
-
-    def peek_front(self): # returns first element
-        if self.head == None: # checks whether list is empty or not
-            print("List is empty")
-        else:
-            return self.head.wart
-
-w = Lista_2k_k()
-print(w.dodaj_przed_nim(1))
-print(w.dodaj_po_nim(2))
-print(w.peek_front)
+l1 = Lista_2k_k()
+w1 = ListaWpis('jeden')
+l1.element = w1
+w2 = ListaWpis('dwa',w1,w1)
+w3 = ListaWpis('trzy',w2,w1)
+w4 = ListaWpis('cztery',w3,w1)
+l1.pobierz_el(0)
+(w1.zamienn(w3))
+l1.print_w_tyl()
